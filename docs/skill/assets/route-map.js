@@ -346,6 +346,16 @@ function amViewer(o){
         features:['bg','road','building','point'],
         WebGLParams:{preserveDrawingBuffer:false}
       });
+      V.el.dataset.mapReady='false';
+      var loading=document.getElementById(V.inline?'amInLoad':'amLoad');
+      V.map.on('complete',function(){
+        requestAnimationFrame(function(){requestAnimationFrame(function(){
+          if(!V.map||!V.el.isConnected)return;
+          V.el.dataset.mapReady='true';
+          if(loading)loading.classList.remove('on');
+          if(V.inline)V.el.closest('#am-inline').dataset.mapStatus='ready';
+        });});
+      });
       V.scale=new AMap.Scale({position:'LB'});   /* 比例尺：徒步日很需要 */
       V.map.addControl(V.scale);
       return true;
@@ -452,8 +462,8 @@ function amViewer(o){
     try{
       /* padding：[上, 下, 左, 右] —— 顶部让给 chips、底部让给抽屉 */
       var pad = V.inline ? [46,26,26,26] : [30, V.drawerH||150, 34, 34];
-      if(V.map.setFitView) V.map.setFitView(V.overlaysAll(), false, pad, V.inline?16:15);
-    }catch(e){ try{V.map.setFitView(null,false,[40,120,40,40]);}catch(e2){} }
+      if(V.map.setFitView) V.map.setFitView(V.overlaysAll(), true, pad, V.inline?16:15);
+    }catch(e){ try{V.map.setFitView(null,true,[40,120,40,40]);}catch(e2){} }
   };
   V.overlaysAll=function(){
     var out=[];
@@ -847,7 +857,6 @@ function amEnsureOverlayViewer(){
   load.classList.add('on'); fb.innerHTML='';
   amLoadSDK(function(err){
     if(!AM.ovl||!AM.ovl.classList.contains('on')) { if(!err) amWarmOverlay(); return; }
-    load.classList.remove('on');
     if(err||!window.AMap){ amOverlayDegrade(); return; }
     amWarmOverlay();
   });
@@ -860,7 +869,6 @@ function amWarmOverlay(){
     AM.ov=amViewer({el:el, inline:false, onPaint:amPaintDrawer, onDrawer:amDrawerHighlight});
     if(!AM.ov.create()){ amOverlayDegrade(); return; }
   }
-  root.querySelector('#amLoad').classList.remove('on');
   root.querySelector('#amFb').innerHTML='';
   AM.ov.setMode(AM.mode);
   amPaintLegend();amPaintChips();
@@ -1027,11 +1035,10 @@ function amMountInline(){
  amPaintInlineFoot();var loading=document.getElementById('amInLoad');loading.classList.add('on');
  amLoadSDK(function(err){
   if(document.getElementById('am-inline')!==host)return;
-  loading.classList.remove('on');
-  if(err){host.dataset.mapStatus='failed';var fb=document.getElementById('amInFb');fb.innerHTML=amFallbackHTML(m);fb.classList.add('on');host.classList.add('am-degraded');return;}
+  if(err){loading.classList.remove('on');host.dataset.mapStatus='failed';var fb=document.getElementById('amInFb');fb.innerHTML=amFallbackHTML(m);fb.classList.add('on');host.classList.add('am-degraded');return;}
   AM.iv=amViewer({el:document.getElementById('amInMap'),inline:true,onPaint:amPaintInlineFoot});
-  if(!AM.iv.create()){host.dataset.mapStatus='failed';toast('地图初始化未完成，请在高德打开地点。');return;}
-  host.dataset.mapStatus='ready';AM.iv.setMode(AM.imode);
+  if(!AM.iv.create()){loading.classList.remove('on');host.dataset.mapStatus='failed';toast('地图初始化未完成，请在高德打开地点。');return;}
+  AM.iv.setMode(AM.imode);
  });
 }
 function amOpenCurrent(k){AM.imode=amCurDayKey();amOpenOverlay(k||AM.imode);}
@@ -1045,6 +1052,6 @@ document.addEventListener('click',function(e){
 });
 new MutationObserver(function(){amViewers.forEach(function(v){v.theme();});}).observe(document.body,{attributes:true,attributeFilter:['data-theme']});
 var resizeTimer;window.addEventListener('resize',function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(function(){amViewers.forEach(function(v){if(v.map){v.map.resize();v.fit();}});},240);});
-var fab=document.createElement('button');fab.id='am-fab';fab.className='am-fab';fab.setAttribute('aria-label','打开路线地图');fab.innerHTML=icon('map');document.body.appendChild(fab);
+var fab=document.createElement('button');fab.id='am-fab';fab.className='am-fab';fab.setAttribute('aria-label','打开路线地图');fab.innerHTML=icon('map')+'<span>地图</span>';document.body.appendChild(fab);
 if(current==='trip'&&view==='route')amMountInline();
 })();

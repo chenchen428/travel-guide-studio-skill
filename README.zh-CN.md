@@ -111,6 +111,8 @@ python3 scripts/build_pages.py
 
 ## 验收建议
 
+首屏点击“路线地图”即可打开全程总览；栏目切换会恢复各自的阅读位置。首次载入时显示加载提示。
+
 在手机上打开 [杭州地图案例](https://chenchen428.github.io/travel-guide-studio-skill/hangzhou-guide.html#trip-map)：
 
 1. 切换日期，再打开全屏地图查看全览、逐日与备选路线。
