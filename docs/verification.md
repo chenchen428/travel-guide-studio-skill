@@ -79,3 +79,9 @@ README 英文与中文图库使用本次生成页的真实浏览器截图，并�
 
 
 地图加载提示改为等待高德地图的资源完成事件后隐藏，内嵌地图的ready标记也在该事件后设置；不再把SDK脚本到达或Map构造完成当作底图已显示。依据[高德Map生命周期文档](https://developer.amap.com/api/javascript-api-v2/guide/map/lifecycle)，并通过实际底图截图核验。
+
+## Agent installation prompt · 2026-10-13
+
+English and Chinese README introductions include copyable installation prompts. Pages adds a compact “让 Agent 安装技能” entry, a 44px copy button, success feedback and an expandable read-only prompt. The prompt points to the generic nine-file skill ZIP; no skill was installed during this change.
+
+Local browser verification: clipboard read-back exactly matches all 464 characters of the Chinese prompt. The 375px and 430px layouts have no horizontal overflow, and the desktop preview still contains one mobile frame. JavaScript syntax and Git whitespace checks pass.

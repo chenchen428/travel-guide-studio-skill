@@ -8,6 +8,16 @@
 
 [**GitHub Pages 展示与验收入口**](https://chenchen428.github.io/travel-guide-studio-skill/) · [杭州完整案例](https://chenchen428.github.io/travel-guide-studio-skill/hangzhou-guide.html#trip-map) · [下载技能包](https://chenchen428.github.io/travel-guide-studio-skill/downloads/travel-guide-studio.zip) · [SKILL.md](SKILL.md)
 
+## 让 Agent 安装技能
+
+点击下方代码块右上角的复制按钮，把提示词粘贴给你的 Agent。[Pages 展示页](https://chenchen428.github.io/travel-guide-studio-skill/)也提供一键复制入口。
+
+```text
+请帮我安装 travel-guide-studio 技能，项目地址：https://github.com/chenchen428/travel-guide-studio-skill。
+先阅读 https://chenchen428.github.io/travel-guide-studio-skill/skill/SKILL.md，再下载 https://chenchen428.github.io/travel-guide-studio-skill/downloads/travel-guide-studio.zip，将完整技能包解压到你支持的用户技能目录（Codex 为 ~/.codex/skills/travel-guide-studio）。
+检查 SKILL.md、agents/、assets/、references/ 和 scripts/render.py 是否齐全。安装包包含通用模板，不包含展示案例的行程数据。安装完成后，告诉我如何调用 $travel-guide-studio 为我自己的旅行生成攻略页面。
+```
+
 ![我们设计的旅行手册桌面首页截图](docs/images/designed-desktop-home.jpg)
 
 ## 可以做什么
@@ -91,7 +101,7 @@ python3 scripts/render.py examples/suzhou-draft.json suzhou-draft.html
 
 ## GitHub Pages 如何展示
 
-展示页只呈现一个手机外壳和真实攻略效果，长篇说明留在中英文 README。GitHub Pages 从 **main 分支的 /docs** 发布：
+展示页聚焦一个手机外壳和真实攻略效果，上方提供安装提示词与一键复制入口，长篇说明留在中英文 README。GitHub Pages 从 **main 分支的 /docs** 发布：
 
 - 首页：默认手机外壳中的可交互攻略，附源码与下载入口。
 - `docs/hangzhou-guide.html`：杭州完整地图案例。
