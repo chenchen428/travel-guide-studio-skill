@@ -10,12 +10,10 @@
 
 ## 让 Agent 安装技能
 
-点击下方代码块右上角的复制按钮，把提示词粘贴给你的 Agent。[Pages 展示页](https://chenchen428.github.io/travel-guide-studio-skill/)也提供一键复制入口。
+复制下面一句话给你的 Agent 即可。具体步骤放在项目的[安装指引](docs/install.md)中；[Pages 展示页](https://chenchen428.github.io/travel-guide-studio-skill/)也提供一键复制入口。
 
 ```text
-请帮我安装 travel-guide-studio 技能，项目地址：https://github.com/chenchen428/travel-guide-studio-skill。
-先阅读 https://chenchen428.github.io/travel-guide-studio-skill/skill/SKILL.md，再下载 https://chenchen428.github.io/travel-guide-studio-skill/downloads/travel-guide-studio.zip，将完整技能包解压到你支持的用户技能目录（Codex 为 ~/.codex/skills/travel-guide-studio）。
-检查 SKILL.md、agents/、assets/、references/ 和 scripts/render.py 是否齐全。安装包包含通用模板，不包含展示案例的行程数据。安装完成后，告诉我如何调用 $travel-guide-studio 为我自己的旅行生成攻略页面。
+请按此指引安装技能：https://chenchen428.github.io/travel-guide-studio-skill/install.md
 ```
 
 ![我们设计的旅行手册桌面首页截图](docs/images/designed-desktop-home.jpg)

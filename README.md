@@ -8,12 +8,10 @@ An Agent skill that turns travel requirements or an existing guide into a **mobi
 
 ## Install with your Agent
 
-Copy this prompt using the code block's copy button and paste it into your Agent. The [Pages preview](https://chenchen428.github.io/travel-guide-studio-skill/) also has a one-click copy button.
+Copy this line and paste it into your Agent. Installation steps live in the [installation guide](docs/install.md); the [Pages preview](https://chenchen428.github.io/travel-guide-studio-skill/) also has a copy button.
 
 ```text
-Install the travel-guide-studio skill from https://github.com/chenchen428/travel-guide-studio-skill.
-Read https://chenchen428.github.io/travel-guide-studio-skill/skill/SKILL.md, then download and extract the complete skill package from https://chenchen428.github.io/travel-guide-studio-skill/downloads/travel-guide-studio.zip into your supported user skill directory (for Codex: ~/.codex/skills/travel-guide-studio).
-Check that SKILL.md, agents/, assets/, references/ and scripts/render.py are present. The package contains reusable templates, not the showcase itinerary. After installation, tell me how to invoke $travel-guide-studio to generate a handbook for my own trip.
+Install the skill using this guide: https://chenchen428.github.io/travel-guide-studio-skill/install.md
 ```
 
 ![Designed desktop homepage, captured from the generated guide](docs/images/designed-desktop-home.jpg)

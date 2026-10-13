@@ -85,3 +85,7 @@ README 英文与中文图库使用本次生成页的真实浏览器截图，并�
 English and Chinese README introductions include copyable installation prompts. Pages adds a compact “让 Agent 安装技能” entry, a 44px copy button, success feedback and an expandable read-only prompt. The prompt points to the generic nine-file skill ZIP; no skill was installed during this change.
 
 Local browser verification: clipboard read-back exactly matches all 464 characters of the Chinese prompt. The 375px and 430px layouts have no horizontal overflow, and the desktop preview still contains one mobile frame. JavaScript syntax and Git whitespace checks pass.
+
+### One-line installation prompt
+
+Installation steps now live in `docs/install.md`, published at `/install.md`. README prompts and the Pages copy button use one sentence plus that link. The Chinese prompt is 76 characters with no newline; 375px layout has no horizontal overflow, and the copy button displays success feedback.
