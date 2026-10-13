@@ -89,3 +89,11 @@ Local browser verification: clipboard read-back exactly matches all 464 characte
 ### One-line installation prompt
 
 Installation steps now live in `docs/install.md`, published at `/install.md`. README prompts and the Pages copy button use one sentence plus that link. The Chinese prompt is 76 characters with no newline; 375px layout has no horizontal overflow, and the copy button displays success feedback.
+
+## Mobile presentation and persistent header · 2026-10-13
+
+At 375, 390, 430 and 440px, Pages hides the external project header, installation/copy section and footer. The iframe fills the viewport from (0, 0); the phone frame has no padding, corner radius or shadow. Desktop retains the 414px frame and project/install links.
+
+The handbook header uses an independent sticky container: 65px on mobile and 76px on desktop. After scrolling 812px in itinerary and 1624px in preparation, its top remains 0. Switching back restores itinerary to 812px. On desktop, the navigation starts at 76px below the header after a 1440px scroll. In print media the header becomes static and navigation is hidden.
+
+The 375px fullscreen map still fills 375×812px, displays the geographic basemap and routes, covers the handbook header, and closes normally. Skill resources and the nine-file ZIP include the persistent-header template.

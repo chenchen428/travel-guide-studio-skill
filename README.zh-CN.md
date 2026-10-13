@@ -99,9 +99,9 @@ python3 scripts/render.py examples/suzhou-draft.json suzhou-draft.html
 
 ## GitHub Pages 如何展示
 
-展示页聚焦一个手机外壳和真实攻略效果，上方提供安装提示词与一键复制入口，长篇说明留在中英文 README。GitHub Pages 从 **main 分支的 /docs** 发布：
+展示页在手机端直接铺满攻略内容，页首标题栏与底部导航保持可见；隐藏外部安装、项目入口和手机边框。桌面端保留手机外壳、安装提示词与项目入口，长篇说明留在中英文 README。GitHub Pages 从 **main 分支的 /docs** 发布：
 
-- 首页：默认手机外壳中的可交互攻略，附源码与下载入口。
+- 首页：手机端直接展示攻略，桌面端使用手机外壳并提供安装、源码与下载入口。
 - `docs/hangzhou-guide.html`：杭州完整地图案例。
 - `docs/suzhou-draft.html`：苏州日期未定草稿。
 - `docs/skill/`：可通过 URL 读取的完整技能与配套资源。
