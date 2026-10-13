@@ -1,0 +1,51 @@
+{
+  "title": "",
+  "destination": "",
+  "eyebrow": "",
+  "intro": "",
+  "origin": "",
+  "travelers": null,
+  "nights": null,
+  "currency": "CNY",
+  "asOf": "",
+  "status": "draft",
+  "source": {
+    "title": "",
+    "url": "",
+    "accessedAt": "",
+    "note": ""
+  },
+  "sources": [],
+  "days": [
+    {
+      "id": "day-1",
+      "date": null,
+      "weekday": "",
+      "label": "",
+      "title": "",
+      "weather": "",
+      "temperature": "",
+      "stamina": null,
+      "kind": "",
+      "alerts": [],
+      "rest": "",
+      "stops": [],
+      "alternatives": [],
+      "extra": {}
+    }
+  ],
+  "priorityChecklist": [],
+  "checklist": [],
+  "principles": [],
+  "transport": {},
+  "food": {},
+  "practical": {},
+  "budget": {
+    "defaultTier": "",
+    "note": "",
+    "tiers": [],
+    "addons": [],
+    "conflicts": []
+  },
+  "map": null
+}

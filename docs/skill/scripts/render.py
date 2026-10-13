@@ -97,8 +97,8 @@ def render(input_path, output_path):
     if map_data is not None:
         if map_data.get('provider') != 'amap' or not map_data.get('browserKey'):
             raise ValueError('map: expected amap provider and browserKey')
-        if not isinstance(map_data.get('pois'), list) or not isinstance(map_data.get('routes'), dict):
-            raise ValueError('map: expected pois and routes')
+        if not isinstance(map_data.get('pois'), list) or not map_data['pois'] or not isinstance(map_data.get('routes'), dict):
+            raise ValueError('map: expected non-empty pois and routes')
         routes = map_data['routes']
         if not isinstance(routes.get('days'), list) or not isinstance(routes.get('alt'), list):
             raise ValueError('map.routes: expected days and alt arrays')

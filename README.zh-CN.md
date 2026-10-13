@@ -4,6 +4,8 @@
 
 把旅行需求或已有攻略整理成**移动端友好的旅行手册**，并输出可交互 HTML 页面。技能自带页面模板、真实地图模块、数据合同和 Python 生成器；美化时保留参考攻略的核心功能。
 
+技能没有默认目的地、行程、价格、坐标或地图 Key。`assets/trip-template.json` 是空白数据骨架；案例数据独立放在 `examples/`，只服务 README 与 Pages 展示，不包含在技能下载包中。
+
 [**GitHub Pages 展示与验收入口**](https://chenchen428.github.io/travel-guide-studio-skill/) · [杭州完整案例](https://chenchen428.github.io/travel-guide-studio-skill/hangzhou-guide.html#trip-map) · [下载技能包](https://chenchen428.github.io/travel-guide-studio-skill/downloads/travel-guide-studio.zip) · [SKILL.md](SKILL.md)
 
 ![我们设计的旅行手册桌面首页截图](docs/images/designed-desktop-home.jpg)
@@ -41,6 +43,8 @@
 
 <img src="docs/images/designed-mobile-home.jpg" alt="我们设计的手机首页" width="320"> <img src="docs/images/designed-mobile-itinerary.jpg" alt="我们设计的手机行程页" width="320">
 
+<img src="docs/images/designed-mobile-preparation.jpg" alt="统一 SVG 图标的准备清单" width="320"> <img src="docs/images/designed-mobile-map.jpg" alt="统一控件样式的真实地理地图" width="320">
+
 ### 苏州两天一晚草稿
 
 [查看草稿页面](https://chenchen428.github.io/travel-guide-studio-skill/suzhou-draft.html) · [输入 JSON](examples/suzhou-draft.json)
@@ -70,10 +74,12 @@ git clone https://github.com/chenchen428/travel-guide-studio-skill.git travel-gu
 要求 Python 3.9+，生成器本身不依赖第三方库。
 
 ```bash
-python3 scripts/render.py assets/example-trip.json travel-guide.html
+cp assets/trip-template.json trip.json
+# 按本次需求和核实资料填写 trip.json。
+python3 scripts/render.py trip.json travel-guide.html
 ```
 
-修改 `assets/example-trip.json` 的结构为自己的旅行输入，再用同一命令生成。金额支持按每人、整套每晚、团队全程或每人每天计价；团队总额从分项相加，人均仅在显示时取整。
+先填写空白骨架，再用同一命令生成。生成器只读取显式传入的文件，不回退读取展示案例。金额支持按每人、整套每晚、团队全程或每人每天计价；团队总额从分项相加，人均仅在显示时取整。
 
 新目的地应重新核实事实、取得真实坐标与路线数据、配置自己的高德浏览器 JS Key，并适配主视觉。案例中继承的是参考页公开的浏览器配置；仓库不包含服务端 API Key 或安全密钥。不要把杭州坐标、历史规则或浏览器配置默认套用于其他城市。
 
@@ -123,7 +129,7 @@ travel-guide-studio/
 ├── agents/openai.yaml
 ├── assets/
 │   ├── page-template.html
-│   ├── example-trip.json
+│   ├── trip-template.json
 │   ├── route-map.js
 │   └── route-map.css
 ├── references/
@@ -132,7 +138,7 @@ travel-guide-studio/
 ├── scripts/
 │   ├── render.py
 │   └── build_pages.py
-├── examples/suzhou-draft.json
+├── examples/{hangzhou.json,suzhou-draft.json}
 ├── docs/
 │   ├── index.html
 │   ├── hangzhou-guide.html

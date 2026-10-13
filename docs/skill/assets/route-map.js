@@ -16,13 +16,13 @@ var AM_JS_KEY = data.map.browserKey;
 var AM_PLUGINS = 'AMap.Scale';   /* 🔒 方案0：只保留纯客户端插件，其余服务类插件已全部移除 */
 var AM_SDK_TIMEOUT = 12000;      /* 12 秒超时 → 降级 */
 var AM_API_GAP = 280;            /* 路径规划串行限流间隔（≥250ms），防 QPS */
-var AM_WEST_LAKE = [120.1485, 30.2425]; /* 降级/定位失败回退中心：西湖 */
+var AM_CENTER = [AM_POIS[0].lng, AM_POIS[0].lat]; /* 初始/定位失败中心来自本次输入地点 */
 
 /* POI 索引：id → 完整 POI（用于补 cat / rating / opentime / tel / rectag） */
 var AM_POI = {};
 (function(){ for(var i=0;i<AM_POIS.length;i++){ AM_POI[AM_POIS[i].id]=AM_POIS[i]; } })();
 
-/* 模式清单：全览 + 7 天 + 4 个备选。alt 的 key/title/color 直接来自数据文件 */
+/* 模式清单：全览 + 输入中的全部日期与备选。alt 的 key/title/color 直接来自数据文件 */
 var AM_MODES = [{k:'all', label:'全览', short:'全览', color:'#4a7c74', title:AM_ROUTES.days.length+' 天全览'}];
 (function(){
   for(var i=0;i<AM_ROUTES.days.length;i++){
@@ -32,8 +32,7 @@ var AM_MODES = [{k:'all', label:'全览', short:'全览', color:'#4a7c74', title
   }
   for(var j=0;j<AM_ROUTES.alt.length;j++){
     var a=AM_ROUTES.alt[j];
-    var nm = a.key==='liangzhu' ? '良渚(替换)' : a.key==='xixi' ? '西溪(加选)'
-           : a.key==='guihua_b' ? '桂花PlanB' : a.key==='qiandao' ? '千岛湖' : a.key;
+    var nm = a.label || a.title || a.key;
     AM_MODES.push({k:'a_'+a.key, label:nm, short:nm, color:a.color, title:a.title,
       swap:a.swap||'', stops:a.stops, kind:'alt', idx:j});
   }
@@ -54,17 +53,17 @@ var AM_CATS = [
    reason : 为什么不调 API —— 山径/游船没有对应道路网，高德步行规划会给出
             荒谬的绕路结果（几十公里），必须强制用直线距离并明确标注口径。 */
 var AM_LEG = {
-  walk:     {ic:'🚶', nm:'步行',     api:'walking',  dash:null,          speed:4600, tag:'道路实测'},
-  drive:    {ic:'🚕', nm:'打车',     api:'driving',  dash:null,          speed:22000,tag:'道路实测'},
-  metro:    {ic:'🚇', nm:'地铁',     api:'transfer', dash:null,          speed:32000,tag:'轨道'},
-  bus:      {ic:'🚌', nm:'公交',     api:'transfer', dash:null,          speed:16000,tag:'公交'},
-  boat:     {ic:'⛵', nm:'游船',     api:null,       dash:[12,8],        speed:0,    tag:'水面直线'},
-  mountain: {ic:'⛰️', nm:'山径',     api:null,       dash:[3,7],         speed:2600, tag:'山径直线'},
-  foot:     {ic:'🚶', nm:'景区内步行',api:null,      dash:[2,5],         speed:4200, tag:'景区内直线'}
+  walk:     {ic:icon('walk'), nm:'步行',     api:'walking',  dash:null,          speed:4600, tag:'道路实测'},
+  drive:    {ic:icon('car'), nm:'打车',     api:'driving',  dash:null,          speed:22000,tag:'道路实测'},
+  metro:    {ic:icon('train'), nm:'地铁',     api:'transfer', dash:null,          speed:32000,tag:'轨道'},
+  bus:      {ic:icon('train'), nm:'公交',     api:'transfer', dash:null,          speed:16000,tag:'公交'},
+  boat:     {ic:icon('boat'), nm:'游船',     api:null,       dash:[12,8],        speed:0,    tag:'水面直线'},
+  mountain: {ic:icon('mountain'), nm:'山径',     api:null,       dash:[3,7],         speed:2600, tag:'山径直线'},
+  foot:     {ic:icon('walk'), nm:'景区内步行',api:null,      dash:[2,5],         speed:4200, tag:'景区内直线'}
 };
 /* 山径段绝对不调步行 API 的原因（写给未来维护者）：
-   十里琅珰山脊、九溪十八涧为景区土路/溪谷，高德步行路网沿机动车道计算，
-   会把两点间 2km 的山脊线算成 20km+ 的绕行，属于错误数据，故一律 haversine。 */
+   景区土路、山脊与溪谷可能没有道路路网；不使用机动车路网冒充山径。
+   缺少真实山径数据时用 haversine，并明确标注直线口径。 */
 
 /* ---------- 小工具 ---------- */
 function amEsc(s){ /* 优先复用页面既有 esc()，缺失时本地兜底 */
@@ -123,10 +122,7 @@ function amMapStyle(){ return amIsDark()?'amap://styles/dark':'amap://styles/whi
 function amReduce(){
   return !!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
-function amNum(n){ /* ①②③…⑳，超过则回落阿拉伯数字 */
-  var C='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
-  return (n>=1&&n<=20)?C.charAt(n-1):String(n);
-}
+function amNum(n){ return String(n); }
 function amCatOf(stop){ var p=AM_POI[stop.id]; return p&&p.cat?p.cat:'scenic'; }
 function amOpenUrl(name){
   var u=amAmapUrl(name);
@@ -262,7 +258,7 @@ function amFallbackHTML(mode){
       +'</div></div></li>';
   }
   h+='</ol></div>';
-  return h;
+  return styleGlyphs(h);
 }
 
 /* ==========================================================================
@@ -345,7 +341,7 @@ function amViewer(o){
       V.map=new AMap.Map(V.el,{
         viewMode:'2D',                      /* 手机端 2D 性能更好 */
         mapStyle:amMapStyle(),
-        zoom:12, center:AM_WEST_LAKE,
+        zoom:12, center:AM_CENTER,
         resizeEnable:true, isHotspot:true,
         features:['bg','road','building','point'],
         WebGLParams:{preserveDrawingBuffer:false}
@@ -387,7 +383,7 @@ function amViewer(o){
     var segs=all?[]:V.segs;
 
     if(all){
-      /* 全览：7 天路线同时显示，各用自己的 color */
+      /* 全览：所有日期路线同时显示，各用自己的 color */
       for(var di=0;di<AM_ROUTES.days.length;di++){
         var dd=AM_ROUTES.days[di];
         for(var j=1;j<dd.stops.length;j++){
@@ -494,7 +490,7 @@ function amTLng(x,y){
 }
 function amWgs2Gcj(lng,lat){
   lng=Number(lng); lat=Number(lat);
-  if(!isFinite(lng)||!isFinite(lat)) return [120.1485,30.2425];
+  if(!isFinite(lng)||!isFinite(lat)) return AM_CENTER.slice();
   if(amOutChina(lng,lat)) return [lng,lat];
   var dLat=amTLat(lng-105.0,lat-35.0), dLng=amTLng(lng-105.0,lat-35.0);
   var rl=lat/180.0*Math.PI, m=Math.sin(rl), m2=1-AM_GCJ_EE*m*m, sq=Math.sqrt(m2);
@@ -521,7 +517,13 @@ function amExtend(V){
     for(var i=0;i<V.markers.length;i++){
       V.markers[i].el.classList.toggle('am-mk-on', V.markers[i].idx===idx && V.markers[i].mode===mode);
     }
-    V.openIW(stop, mode, idx);
+    var drawer=!V.inline&&AM.ovl&&AM.ovl.querySelector('#amDrawer');
+    if(drawer&&drawer.classList.contains('am-open')){
+      amToggleDrawer();
+      setTimeout(function(){
+        if(V.map&&V.sel===idx&&AM.ovl.classList.contains('on')){ V.map.resize(); V.openIW(stop, mode, idx); }
+      },300);
+    }else V.openIW(stop, mode, idx);
     /* 抽屉里对应行高亮并滚动到可见 */
     if(V.onDrawer) { try{V.onDrawer(idx);}catch(e){} }
   };
@@ -533,7 +535,7 @@ function amExtend(V){
     var name=stop.name||poi.name||'';
     var amName=stop.amap_name||poi.amap_name||name;
     var h='<div class="am-iw" role="dialog" aria-label="'+amEsc(name)+'">';
-    h+='<button class="am-iw-x" data-am-iwclose aria-label="关闭">✕</button>';
+    h+='<button class="am-iw-x" data-am-iwclose aria-label="关闭">'+icon('close')+'</button>';
     h+='<div class="am-iw-hd"><span class="am-iw-no" style="background:'+amEsc(mode.color||'#4a7c74')+'">'+amNum(idx+1)+'</span>'
       +'<div><div class="am-iw-t">'+amEsc(name)+'</div>'
       +(stop.t?'<div class="am-iw-time">🕐 计划 '+amEsc(stop.t)+(mode.date?' · '+amEsc(mode.date):'')+'</div>':'')+'</div></div>';
@@ -560,7 +562,7 @@ function amExtend(V){
       +'</div></div>';
 
     var box=document.createElement('div');
-    box.innerHTML=h;
+    box.innerHTML=styleGlyphs(h);
     box=box.firstChild;
     try{
       if(V.iw){ V.iw.close(); V.iw=null; }
@@ -636,14 +638,14 @@ function amExtend(V){
      ⚠️ 关键坑：浏览器返回 WGS-84，高德底图是 GCJ-02。中国境内不转换会偏移约
         300—600 米，蓝点会掉到隔壁街区。故必须做 WGS84→GCJ02 转换（amWgs2Gcj）。
      ⚠️ 浏览器仅在 https 或 localhost 下允许定位；file:// 打开时会直接失败 →
-        已有 fail() 回退到西湖中心，不会卡死。 ---- */
+        已有 fail() 回退到行程地图中心，不会卡死。 ---- */
   V.locate=function(){
     if(!V.map){ amToast('地图未就绪'); return; }
     var fail=function(msg){
-      amToast(msg||'定位失败，已回到西湖中心',2600);
-      try{ V.map.setZoomAndCenter(13,AM_WEST_LAKE); }catch(e){}
+      amToast(msg||'定位失败，已回到行程地图中心',2600);
+      try{ V.map.setZoomAndCenter(13,AM_CENTER); }catch(e){}
     };
-    if(!navigator.geolocation){ fail('当前浏览器不支持定位，已回到西湖中心'); return; }
+    if(!navigator.geolocation){ fail('当前浏览器不支持定位，已回到行程地图中心'); return; }
     amToast('正在获取位置…',1400);
     try{
       navigator.geolocation.getCurrentPosition(function(pos){
@@ -659,9 +661,9 @@ function amExtend(V){
                   +'，已校正 GCJ-02 偏移）',2800);
         }catch(e){ fail(); }
       }, function(err){
-        fail(err&&err.code===1?'定位权限被拒绝，已回到西湖中心'
-            :err&&err.code===3?'定位超时，已回到西湖中心'
-            :'无法获取定位，已回到西湖中心');
+        fail(err&&err.code===1?'定位权限被拒绝，已回到行程地图中心'
+            :err&&err.code===3?'定位超时，已回到行程地图中心'
+            :'无法获取定位，已回到行程地图中心');
       }, {enableHighAccuracy:true, timeout:9000, maximumAge:60000});
     }catch(e){ fail(); }
   };
@@ -689,10 +691,10 @@ function amBuildOverlay(){
   root.innerHTML=
     '<div class="am-panel">'
     +'<div class="am-top">'
-      +'<button class="am-top-x" data-amclose aria-label="关闭地图">✕</button>'
-      +'<div class="am-top-t"><div class="am-top-h">🗺️ 路线地图</div>'
-      +'<div class="am-top-s" id="amModeName">七天全览</div></div>'
-      +'<button class="am-top-b" id="amLocBtn" aria-label="定位到我" title="定位到我">⌖</button>'
+      +'<button class="am-top-x" data-amclose aria-label="关闭地图">'+icon('close')+'</button>'
+      +'<div class="am-top-t"><div class="am-top-h">'+icon('map')+' 路线地图</div>'
+      +'<div class="am-top-s" id="amModeName">全程总览</div></div>'
+      +'<button class="am-top-b" id="amLocBtn" aria-label="定位到我" title="定位到我">'+icon('locate')+'</button>'
     +'</div>'
     +'<div class="am-chips am-chips-mode" id="amModes"></div>'
     +'<div class="am-chips am-chips-cat" id="amCats"></div>'
@@ -707,7 +709,7 @@ function amBuildOverlay(){
       +'<button class="am-dhd" id="amDhd" aria-expanded="false">'
         +'<span class="am-grab"></span>'
         +'<span class="am-dsum" id="amDsum">—</span>'
-        +'<span class="am-darrow">⌃</span>'
+        +'<span class="am-darrow">'+icon('chevron-up')+'</span>'
       +'</button>'
       +'<div class="am-dbody" id="amDbody"></div>'
     +'</div>'
@@ -810,12 +812,12 @@ function amSetOverlayMode(k){
     amEnsureOverlayViewer();
   }
 }
-/* 图例：仅全览模式显示 7 天配色 + 线型口径 */
+/* 图例：仅全览模式显示分天配色 + 线型口径 */
 function amPaintLegend(){
   var box=AM.ovl&&AM.ovl.querySelector('#amLegend');
   if(!box) return;
   if(AM.mode!=='all'){ box.innerHTML=''; box.classList.remove('on'); return; }
-  var h='<div class="am-lg-t">七天配色</div>';
+  var h='<div class="am-lg-t">分天配色</div>';
   for(var i=0;i<AM_ROUTES.days.length;i++){
     var d=AM_ROUTES.days[i];
     h+='<div class="am-lg-r"><i style="background:'+d.color+'"></i>DAY'+d.d+' <span>'+amEsc(d.date)+'</span></div>';
@@ -831,7 +833,7 @@ function amPill(txt,ms){
   var p=AM.ovl&&AM.ovl.querySelector('#amPill');
   if(!p) return;
   if(!txt){ p.classList.remove('on'); p.innerHTML=''; return; }
-  p.innerHTML=txt; p.classList.add('on');
+  p.innerHTML=styleGlyphs(txt); p.classList.add('on');
   clearTimeout(p._t);
   if(ms) p._t=setTimeout(function(){ p.classList.remove('on'); }, ms);
 }
@@ -978,7 +980,7 @@ function amPaintDrawer(){
       +'</span></button>';
   }
   hh+='</div>';
-  body.innerHTML=hh;
+  body.innerHTML=styleGlyphs(hh);
   amPill(su.apiN&&su.apiN===sg.filter(function(x){return !!x.L.api&&!((x.leg==='metro'||x.leg==='bus')&&amNoteHasTime(x.note));}).length
         ? '✅ 已完成 '+su.apiN+' 段原稿高德数据路网' : (su.apiN? '历史路网数据 '+su.apiN+' 段…':''), su.apiN?2600:0);
 }
@@ -988,7 +990,7 @@ function amDrawerHighlight(idx){
   for(var i=0;i<rows.length;i++){
     var on=(+rows[i].getAttribute('data-amstop')===idx);
     rows[i].classList.toggle('on',on);
-    if(on&&rows[i].scrollIntoView) { try{rows[i].scrollIntoView({block:'nearest',behavior:amReduce()?'auto':'smooth'});}catch(e){} }
+    if(on&&root.querySelector('#amDrawer').classList.contains('am-open')&&rows[i].scrollIntoView) { try{rows[i].scrollIntoView({block:'nearest',behavior:amReduce()?'auto':'smooth'});}catch(e){} }
   }
 }
 function amFocusSeg(i){
@@ -999,13 +1001,13 @@ function amFocusSeg(i){
     V.lines[j].pl.setOptions({strokeWeight: V.lines[j].seg===i?8:4, strokeOpacity: V.lines[j].seg===i?1:.35});
   }
   try{ V.map.setFitView([V.lines.filter(function(x){return x.seg===i;})[0].pl],false,[60,180,60,60],16); }catch(e){}
-  amToast(s.L.ic+' '+s.L.nm+' '+amDist(s.dist)+(s.dur?' · '+amDur(s.dur):'')+(s.api?'（原稿高德数据）':'（直线口径）'),2400);
+  amToast(s.L.nm+' '+amDist(s.dist)+(s.dur?' · '+amDur(s.dur):'')+(s.api?'（原稿高德数据）':'（直线口径）'),2400);
 }
 function amFocusStop(i){
   var V=AM.ov; if(!V||!V.map) return;
   var mk=null;
   for(var k=0;k<V.markers.length;k++) if(V.markers[k].idx===i) mk=V.markers[k];
-  if(mk){ V.selectStop(i, mk.stop, mk.mode); try{ V.map.setCenter([mk.stop.lng,mk.stop.lat]); }catch(e){} }
+  if(mk){ try{ V.map.setCenter([mk.stop.lng,mk.stop.lat]); }catch(e){} V.selectStop(i, mk.stop, mk.mode); }
 }
 
 function amCurDayKey(){ return 'd'+(dayIndex+1); }
@@ -1013,7 +1015,7 @@ function amPaintInlineFoot(){
  var ft=document.getElementById('amInFt');if(!ft)return;
  var m=AM_MODE_BY_K[AM.imode];if(!m)return;
  var sg=AM.iv&&AM.iv.segs.length?AM.iv.segs:amBuildSegs(m),su=amSum(sg);
- ft.innerHTML='<div class="am-in-sum">'+m.stops.length+' 站 · '+amSumText(su)+(su.apiN?' · '+su.apiN+' 段原稿预计算路网':'')+'</div><div class="map-note">坐标系 GCJ-02；路线与营业资料截至 '+amEsc(data.map.asOf||data.asOf)+'。道路使用原稿预计算路网，山径与水面为直线口径；并非实时路况。</div><div class="am-in-act"><button class="am-btn am-btn-pri" data-amfull>⤢ 全屏地图</button><button class="am-btn" data-aminline-loc>⌖ 定位到我</button><button class="am-btn" data-amview="tl">回时间轴</button></div>';
+ ft.innerHTML='<div class="am-in-sum">'+m.stops.length+' 站 · '+amSumText(su)+(su.apiN?' · '+su.apiN+' 段原稿预计算路网':'')+'</div><div class="map-note">坐标系 GCJ-02；路线与营业资料截至 '+amEsc(data.map.asOf||data.asOf)+'。道路使用原稿预计算路网，山径与水面为直线口径；并非实时路况。</div><div class="am-in-act"><button class="am-btn am-btn-pri" data-amfull>'+icon('expand')+' 全屏地图</button><button class="am-btn" data-aminline-loc>'+icon('locate')+' 定位到我</button><button class="am-btn" data-amview="tl">回时间轴</button></div>';
 }
 function amReleaseInline(){
  if(AM.iv){if(AM.iv.map)AM.iv.map.destroy();var i=amViewers.indexOf(AM.iv);if(i>=0)amViewers.splice(i,1);AM.iv=null;}
@@ -1043,6 +1045,6 @@ document.addEventListener('click',function(e){
 });
 new MutationObserver(function(){amViewers.forEach(function(v){v.theme();});}).observe(document.body,{attributes:true,attributeFilter:['data-theme']});
 var resizeTimer;window.addEventListener('resize',function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(function(){amViewers.forEach(function(v){if(v.map){v.map.resize();v.fit();}});},240);});
-var fab=document.createElement('button');fab.id='am-fab';fab.className='am-fab';fab.setAttribute('aria-label','打开路线地图');fab.innerHTML='🗺';document.body.appendChild(fab);
+var fab=document.createElement('button');fab.id='am-fab';fab.className='am-fab';fab.setAttribute('aria-label','打开路线地图');fab.innerHTML=icon('map');document.body.appendChild(fab);
 if(current==='trip'&&view==='route')amMountInline();
 })();

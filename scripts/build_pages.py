@@ -8,9 +8,11 @@ from render import render
 root = Path(__file__).resolve().parents[1]
 docs = root / 'docs'
 docs.mkdir(exist_ok=True)
-render(root / 'assets/example-trip.json', docs / 'hangzhou-guide.html')
+render(root / 'examples/hangzhou.json', docs / 'hangzhou-guide.html')
 render(root / 'examples/suzhou-draft.json', docs / 'suzhou-draft.html')
 files = [root / 'SKILL.md']
+# Rebuild the online skill directory so retired case assets cannot remain in it.
+shutil.rmtree(docs / 'skill', ignore_errors=True)
 for folder in ('agents', 'assets', 'references'):
     files.extend(p for p in (root / folder).rglob('*') if p.is_file())
 files.append(root / 'scripts/render.py')
