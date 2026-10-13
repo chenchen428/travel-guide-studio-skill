@@ -1,0 +1,173 @@
+{
+  "title": "苏州，两天一晚的慢行手册",
+  "destination": "苏州",
+  "eyebrow": "SUZHOU · TWO DAYS",
+  "intro": "日期待定；以下是未核实的规划草稿。地点、开放与交通均须出发前确认。",
+  "origin": "待确认",
+  "travelers": 2,
+  "nights": 1,
+  "currency": "CNY",
+  "asOf": "2026-10-13",
+  "status": "draft",
+  "source": {
+    "title": "用户需求与规划假设",
+    "url": "",
+    "accessedAt": "",
+    "note": "仅使用用户提出的苏州两天一晚需求；本次未查询任何外部事实。预算金额仅是安排额度，非酒店、车票或餐厅报价。"
+  },
+  "days": [
+    {
+      "id": "day-1",
+      "date": null,
+      "weekday": "待定",
+      "label": "入城与街区",
+      "title": "留白入城，慢逛街区",
+      "weather": "待临近出发核实",
+      "temperature": "待临近出发核实",
+      "stamina": 2,
+      "kind": "轻量候选路线",
+      "alerts": [
+        "地点开放、预约与通行尚未核实。"
+      ],
+      "rest": "午后安排休息；疲劳时缩短路线，返程时间按实际车次调整。",
+      "stops": [
+        {
+          "time": "10:00—12:00",
+          "type": "spot",
+          "name": "平江路（候选）",
+          "transport": "通行与耗时待地图核实",
+          "mapQuery": "苏州 平江路",
+          "notes": [
+            "仅作地点候选，不代表开放或预约已确认。"
+          ],
+          "sources": []
+        }
+      ],
+      "alternatives": [
+        {
+          "q": "下雨或预约失败",
+          "a": "改为短时街区或室内休息；室内店铺开放需另行确认。"
+        }
+      ],
+      "extra": {}
+    },
+    {
+      "id": "day-2",
+      "date": null,
+      "weekday": "待定",
+      "label": "园林候选与返程",
+      "title": "择一园林，午后返程",
+      "weather": "待临近出发核实",
+      "temperature": "待临近出发核实",
+      "stamina": 2,
+      "kind": "轻量候选路线",
+      "alerts": [
+        "地点开放、预约与通行尚未核实。"
+      ],
+      "rest": "午后安排休息；疲劳时缩短路线，返程时间按实际车次调整。",
+      "stops": [
+        {
+          "time": "09:00—11:00",
+          "type": "spot",
+          "name": "拙政园（候选）",
+          "transport": "通行与耗时待地图核实",
+          "mapQuery": "苏州 拙政园",
+          "notes": [
+            "仅作地点候选，不代表开放或预约已确认。"
+          ],
+          "sources": []
+        }
+      ],
+      "alternatives": [
+        {
+          "q": "下雨或预约失败",
+          "a": "改为短时街区或室内休息；室内店铺开放需另行确认。"
+        }
+      ],
+      "extra": {}
+    }
+  ],
+  "checklist": [
+    {
+      "id": "date",
+      "title": "确定出发日期",
+      "detail": "确定日期后再查开放、预约、车次与住宿。",
+      "deadline": "出发前"
+    }
+  ],
+  "principles": [
+    {
+      "t": "把节奏放慢",
+      "d": "按街区组织候选点；通行与开放尚未核实，步行距离不作确定承诺。"
+    }
+  ],
+  "transport": {},
+  "food": {
+    "dishes": [
+      {
+        "n": "苏式汤面（候选）",
+        "taste": "风味未查证",
+        "tip": "店铺与营业时间待确认；不据此预订。",
+        "src": "规划候选，未查询来源。"
+      }
+    ]
+  },
+  "practical": {
+    "unknown": [
+      "实际日期、人数与出发地待确认；门票、营业、交通与房型待查询。"
+    ]
+  },
+  "budget": {
+    "defaultTier": "planning",
+    "note": "按 2 人、1 晚的安排额度估算，不是市场报价。住宿整套价仅假设可住 2 人；不含未核实的门票和跨城交通。",
+    "tiers": [
+      {
+        "id": "planning",
+        "name": "规划额度",
+        "description": "用于衡量支出上限；实际价格待查。",
+        "items": [
+          {
+            "id": "stay",
+            "name": "住宿预留",
+            "amount": 350,
+            "basis": "night"
+          },
+          {
+            "id": "travel",
+            "name": "市内交通预留",
+            "amount": 100,
+            "basis": "person"
+          },
+          {
+            "id": "food",
+            "name": "餐饮预留",
+            "amount": 75,
+            "basis": "person-day"
+          },
+          {
+            "id": "reserve",
+            "name": "团队机动预留",
+            "amount": 80,
+            "basis": "trip"
+          }
+        ]
+      }
+    ],
+    "addons": [
+      {
+        "id": "night-plus",
+        "name": "住宿升级额度",
+        "amount": 100,
+        "basis": "night",
+        "note": "若选择，每晚整套另加 100 元；与住宿基础额度不重复。"
+      },
+      {
+        "id": "snack",
+        "name": "每日小吃额度",
+        "amount": 15,
+        "basis": "person-day",
+        "note": "若选择，每人每天另加 15 元；不在基础餐饮额度内。"
+      }
+    ]
+  }
+}

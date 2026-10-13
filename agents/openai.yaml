@@ -1,0 +1,4 @@
+interface:
+  display_name: "山水之间 · 旅行手册"
+  short_description: "把旅行需求或现有攻略制作成带时间轴、预算和备选方案的杂志风页面"
+  default_prompt: "使用 $travel-guide-studio，将我的旅行需求或参考攻略整理成可执行的旅行手册，并生成可交互页面供我 review。"
